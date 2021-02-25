@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--资源-->
+
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.js"></script>
+    <script src="https://cdn.bootcss.com/layer/2.3/layer.js"></script>
+    <!--资源end-->
+    <!--分页-->
+    <script src="zpageNav.js"></script>
+    <link rel="stylesheet" href="zpageNav.css">
+    <!--分页end-->
+</head>
+
+<body>
+
+<div class="container" id="app">
+<div class="page-header">
+    <h1>网络请求的例子
+        <small>分页，请求封装</small>
+    </h1>
+</div>
+<p>https://api.apiopen.top/getSongPoetry?page=1&count=20</p>
+<table class="table" >
+    <caption>查看唐诗词</caption>
+    <thead>
+    <tr>
+        <th>名称</th>
+        <th>内容</th>
+        <th>作者</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr v-for="value in data">
+        <td>{{value.title}}</td>
+        <td>{{value.content}}</td>
+        <td>{{value.authors}}</td>
+    </tr>
+    </tbody>
+</table>
+    <!-- pagination start-->
+    <div class="wrap" id="wrap">
+        <zpagenav v-bind:page="page" v-bind:page-size="pageSize" v-bind:total="total"
+                  v-bind:max-page="maxPage"  v-on:pagehandler="pageHandler">
+        </zpagenav>
+    </div>
+
+</div>
+
+</body>
+<script>
+    //网络请求的封装
+    var Request = {
+
+        /**
+         * 获取数据ajax-get请求
+         * @author liaosp
+         */
+        get: function (url, data, callback) {
+            $.ajax({
+                url: url,
+                type: "get",
+                contentType: "application/json",
+                dataType: "json",
+                timeout: 10000,
+                data: data,
+                success: function (data) {
+                    callback(data);
+                }
+            });
+        },
+        /**
+         * 提交json数据的post请求
+         * @author liaosp
+         */
+        post: function (url, data, callback) {
+            $.ajax({
+                url: url,
+                type: "post",
+                contentType: "application/json",
+                dataType: "json",
+                data: data,
+                timeout: 60000,
+                success: function (msg) {
+                    callback(msg);
+                },
+                error: function (xhr, textstatus, thrown) {
+
+                }
+            });
+        },
+
+        /**
+         * 修改数据的ajax-put请求
+         * @author liaosp
+         */
+        put: function (url, data, callback) {
+            $.ajax({
+                url: url,
+                type: "put",
+                contentType: "application/json",
+                dataType: "json",
+                data: data,
+                timeout: 20000,
+                success: function (msg) {
+                    callback(msg);
+                },
+                error: function (xhr, textstatus, thrown) {
+
+                }
+            });
+        },
+        /**
+         * 删除数据的ajax-delete请求
+         * @author liaosp
+         */
+        delete: function (url, data, callback) {
+            $.ajax({
+                url: url,
+                type: "delete",
+                contentType: "application/json",
+                dataType: "json",
+                data: data,
+                success: function (msg) {
+                    callback(msg);
+                },
+                error: function (xhr, textstatus, thrown) {
+
+                }
+            });
+        }
+    }
+</script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            data: '',
+            page: 1,  //显示的是哪一页
+            pageSize: 10, //每一页显示的数据条数
+            total: 150, //记录总数
+            maxPage:9  //最大页数
+        },
+        created:function () {
+            this.requestList();
+        },
+        methods: {
+            requestList: function() {
+                Request.get('https://api.apiopen.top/getSongPoetry',{page:this.page,count:10},this.renderList)
+            },
+            renderList:function (res) {
+                this.data =res.result;
+            },
+            pageHandler: function (page) {
+                //here you can do custom state update
+                this.page = page;
+                this.requestList();
+            }
+        },
+
+    })
+</script>
+
+
+
+
+
+
+
+</html>
